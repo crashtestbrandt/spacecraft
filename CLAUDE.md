@@ -62,12 +62,16 @@ Design docs, one per system, live under `docs/` (`netcode.md`, `simulation.md`, 
 
 ## Build
 
-- A **.NET 8 SDK** must be on PATH (`winget install --id Microsoft.DotNet.SDK.8 -e`); the editor's Build
-  button and `just build` both run `dotnet build`.
+- A **.NET SDK ≥ 8** must be on PATH; the editor's Build button and `just build` both run `dotnet build`.
+  `just dotnet-check` verifies it (and gates `build`); `just dotnet-fetch` installs the .NET 8 SDK through
+  winget, machine-wide -- unlike the editor there is no pinned local copy, because Godot only finds the
+  `dotnet` on PATH. Bump `$PackageId` in `tools/dotnet-fetch.ps1` when `TargetFramework` moves.
 - `nuget.config` in the repo root declares nuget.org so `Godot.NET.Sdk` and Klotho's runtime deps resolve
   regardless of the machine's user-level NuGet config.
 - Local multiplayer testing is multi-process: `just demo [N]` (windowed) and `just demo-test [N]`
   (headless, exit code). Both accept `-AutoPlay`. See `docs/session.md`.
+- `just --list` shows only the **comment line directly above a recipe**. Keep that line a one-line summary;
+  put longer notes above it, separated by a blank line, or they show up truncated in the listing.
 
 ## Layout
 

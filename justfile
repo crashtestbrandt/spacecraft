@@ -11,42 +11,66 @@ set shell := ["powershell.exe", "-NoProfile", "-Command"]
 # resolved binary path.
 godot := justfile_directory() / "tools" / "godot-run.ps1"
 godot_fetch_script := justfile_directory() / "tools" / "godot-fetch.ps1"
+dotnet_check_script := justfile_directory() / "tools" / "dotnet-check.ps1"
+dotnet_fetch_script := justfile_directory() / "tools" / "dotnet-fetch.ps1"
 demo_script := justfile_directory() / "tools" / "demo.ps1"
 demo_test_script := justfile_directory() / "tools" / "demo-test.ps1"
 
+# List every recipe.
 default:
     @just --list
 
-# Install the pinned Godot 4.7 .NET editor (see godot.lock) into .godot-editor/, gitignored. Add
-# -Templates to also fetch the matching export templates, or -Force to re-fetch either even when
+# Add -Templates to also fetch the matching export templates, or -Force to re-fetch either even when
 # already installed. Point $env:GODOT_BIN at an existing Godot 4.7 mono install to skip this
 # entirely -- every recipe below resolves through it first. See README.md.
+
+# Install the pinned Godot 4.7 .NET editor (godot.lock) into .godot-editor/ (gitignored).
 godot-fetch *ARGS:
     & "{{godot_fetch_script}}" {{ARGS}}
 
+# Open the project in the Godot editor.
 editor:
     & "{{godot}}" --editor --path .
 
+# Run the main scene (single instance, lobby-driven).
 run:
     & "{{godot}}" --path .
 
-# Compile the C# assembly with the .NET SDK on PATH (the editor's Build button does the same).
-build:
+# Verify a .NET SDK (8 or newer) is on PATH; a runtime alone can't build. Exit 1 with one line if not.
+dotnet-check:
+    & "{{dotnet_check_script}}"
+
+# Machine-wide, not a pinned local download like godot-fetch: Godot's Build button only finds the
+# `dotnet` on PATH. -Force reinstalls. NuGet sources need no setup -- nuget.config in the repo root
+# declares nuget.org.
+
+# Install the .NET 8 SDK via winget unless dotnet-check already passes.
+dotnet-fetch *ARGS:
+    & "{{dotnet_fetch_script}}" {{ARGS}}
+
+# Compile the C# assembly (what the editor's Build button does); runs dotnet-check first.
+build: dotnet-check
     dotnet build -nologo
 
-# Rebuild .godot/ -- needed after a checkout the editor hasn't opened yet, or after godot-fetch
-# installs a different editor build.
+# Needed after a checkout the editor hasn't opened yet, or after godot-fetch installs a different
+# editor build.
+
+# Rebuild the .godot/ import cache headlessly.
 reimport:
     & "{{godot}}" --headless --path . --import
 
-# Local multiplayer demo: one host window + (N-1) guest windows on 127.0.0.1:7777. Click Ready in
-# each. `just demo 4` for four players; `just demo 2 -AutoPlay` readies every instance and scripts a
-# full-army charge so the match plays itself. See docs/session.md.
+# One host window + (N-1) guest windows on 127.0.0.1:7777. Click Ready in each. `just demo 4` for
+# four players; `just demo 2 -AutoPlay` readies every instance and scripts a full-army charge so the
+# match plays itself. See docs/session.md.
+
+# Local multiplayer demo: N tiled windows on localhost (N = 2..4; add -AutoPlay to self-play).
 demo N="2" *ARGS:
     & "{{demo_script}}" -Players {{N}} {{ARGS}}
 
-# Headless self-test over the real ENet loopback: N processes host/join, auto-ready, verify their
-# armies on the verified timeline and exit 0. Nonzero exit if any peer fails. `just demo-test 4`,
-# add -AutoPlay to also run the scripted engagement.
+# N processes host/join over the real ENet loopback, auto-ready, verify their armies on the verified
+# timeline and exit 0; nonzero if any peer fails or times out. `just demo-test 4`; add -AutoPlay to
+# also run the scripted engagement.
+
+# Headless N-peer self-test with an exit code (N = 2..4; add -AutoPlay for the scripted fight).
 demo-test N="2" *ARGS:
     & "{{demo_test_script}}" -Players {{N}} {{ARGS}}
