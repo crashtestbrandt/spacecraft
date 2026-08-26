@@ -43,7 +43,34 @@ that launches Godot refuses in one line until it's there (`godot-guard` in the `
 - Bumping the pinned version means bumping `godot.lock`'s `tag` and every digest in it, sourced from that
   release's `SHA512-SUMS.txt` — never hand-computed locally.
 
+## Netcode
+
+**Klotho** (`addons/klotho/`, vendored from the upstream `dist/addons/klotho` at v0.9.2) is the deterministic
+lockstep/rollback engine; the wire is **Godot's built-in ENet** through `scripts/Net/GodotEnetTransport.cs`,
+not Klotho's default LiteNetLib. Steam transport comes later as a second `INetworkTransport`. Rules that follow:
+
+- Everything under `scripts/Sim/` runs inside the deterministic step: `FP64`/`int` only, no `float`, no
+  `Godot.*`, no wall clock, no `System.Random`. Klotho's analyzer flags floats there at build time.
+- View code never touches simulation state except to read engine frames; orders reach the sim only through
+  `OrderQueue` → `OnPollInput`.
+- Klotho's `IKLogger` methods take an interpolated-string handler: always `$"..."`, never a plain literal or a
+  ternary of strings.
+- The Klotho editor plugin is not enabled; the runtime works via the `Klotho.props` import alone.
+
+Design docs, one per system, live under `docs/` (`netcode.md`, `simulation.md`, `view.md`, `session.md`).
+**Every new system gets its own page there** alongside its code.
+
+## Build
+
+- A **.NET 8 SDK** must be on PATH (`winget install --id Microsoft.DotNet.SDK.8 -e`); the editor's Build
+  button and `just build` both run `dotnet build`.
+- `nuget.config` in the repo root declares nuget.org so `Godot.NET.Sdk` and Klotho's runtime deps resolve
+  regardless of the machine's user-level NuGet config.
+- Local multiplayer testing is multi-process: `just demo [N]` (windowed) and `just demo-test [N]`
+  (headless, exit code). Both accept `-AutoPlay`. See `docs/session.md`.
+
 ## Layout
 
-`scenes/` (`.tscn`), `scripts/` (`.cs`), `project.godot`, `Spacecraft.csproj`, `tools/` (PowerShell scripts the
-`justfile` wraps).
+`scenes/` (`.tscn`), `scripts/` (`Main.cs` bootstrap, `Net/` transport, `Sim/` deterministic ECS, `View/`
+2D render + input + HUD), `addons/klotho/` (vendored netcode), `docs/` (design docs), `tools/` (PowerShell
+scripts the `justfile` wraps), `project.godot`, `Spacecraft.csproj`, `nuget.config`.

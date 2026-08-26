@@ -1,0 +1,27 @@
+<!-- Import from a DEDICATED SERVER project (.NET console, no Godot):
+       <Import Project="addons/klotho/Klotho.Server.props" />
+     The Server-Driven framework (RoomRouter/RoomManager/ServerLoop/ServerNetworkService) is in the core DLL;
+     KlothoServer.dll adds the server helpers (KlothoServerBootstrap / Config loaders). No Godot adapter. -->
+<Project>
+  <PropertyGroup>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <LangVersion Condition="'$(LangVersion)' == ''">latest</LangVersion>
+  </PropertyGroup>
+  <!-- A server is not a Godot project: never compile the bundled Godot adapter sources (no GodotSharp).
+       This Remove keeps the server safe even if addons/ sits under the server project's default glob. -->
+  <ItemGroup>
+    <Compile Remove="$(MSBuildThisFileDirectory)Adapters/**/*.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="xpTURN.Klotho.Runtime">
+      <HintPath>$(MSBuildThisFileDirectory)lib/xpTURN.Klotho.Runtime.dll</HintPath>
+    </Reference>
+    <Reference Include="KlothoServer">
+      <HintPath>$(MSBuildThisFileDirectory)lib/KlothoServer.dll</HintPath>
+    </Reference>
+    <Analyzer Include="$(MSBuildThisFileDirectory)Analyzers/KlothoGenerator.dll" />
+    <!-- a DLL <Reference> carries no transitive NuGet deps -> declare the core's runtime deps -->
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+    <PackageReference Include="LiteNetLib" Version="2.1.4" />
+  </ItemGroup>
+</Project>
