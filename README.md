@@ -10,18 +10,19 @@ Multiplayer is 2–4 player P2P lockstep on [Klotho](https://github.com/xpTURN/K
 ## Install
 
 - [`just`](https://github.com/casey/just): `winget install --id Casey.Just -e` (or scoop / choco).
-- .NET 8 SDK: `winget install --id Microsoft.DotNet.SDK.8 -e`. The Godot .NET editor builds through the
-  `dotnet` on PATH; without an SDK nothing compiles.
+- .NET 8 SDK: `just dotnet-fetch` (winget, machine-wide; skipped when `just dotnet-check` already finds an
+  SDK ≥ 8). The Godot .NET editor builds through the `dotnet` on PATH; a runtime alone is not enough.
 
-No other install is required: the `justfile` pins its shell to `powershell.exe`, and the Godot editor is a
-pinned download (below).
+No other install is required: the `justfile` pins its shell to `powershell.exe`, the Godot editor is a
+pinned download (below), and NuGet sources come from the checked-in `nuget.config`.
 
 ## Quick start
 
 ```powershell
 just                 # list every recipe
 just godot-fetch     # install the pinned Godot 4.7 .NET editor into .godot-editor/ (gitignored)
-just build           # compile the C# assembly
+just dotnet-fetch    # install the .NET 8 SDK via winget (no-op if `just dotnet-check` already passes)
+just build           # compile the C# assembly (runs dotnet-check first)
 just demo            # two windows on localhost: click Ready in each
 just demo 4 -AutoPlay   # four windows, auto-ready, armies charge the center by themselves
 just demo-test 4     # headless 4-peer self-test over loopback ENet, exit 0 on success
