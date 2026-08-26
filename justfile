@@ -11,6 +11,8 @@ set shell := ["powershell.exe", "-NoProfile", "-Command"]
 # resolved binary path.
 godot := justfile_directory() / "tools" / "godot-run.ps1"
 godot_fetch_script := justfile_directory() / "tools" / "godot-fetch.ps1"
+dotnet_check_script := justfile_directory() / "tools" / "dotnet-check.ps1"
+dotnet_fetch_script := justfile_directory() / "tools" / "dotnet-fetch.ps1"
 demo_script := justfile_directory() / "tools" / "demo.ps1"
 demo_test_script := justfile_directory() / "tools" / "demo-test.ps1"
 
@@ -30,8 +32,18 @@ editor:
 run:
     & "{{godot}}" --path .
 
-# Compile the C# assembly with the .NET SDK on PATH (the editor's Build button does the same).
-build:
+# Verify a .NET SDK >= 8 is on PATH (a runtime alone can't build). One readable line if not.
+dotnet-check:
+    & "{{dotnet_check_script}}"
+
+# Install the .NET 8 SDK via winget unless dotnet-check already passes. Machine-wide, not a pinned
+# local download like godot-fetch: Godot's Build button only finds the `dotnet` on PATH. -Force
+# reinstalls. NuGet sources need no setup -- nuget.config in the repo root declares nuget.org.
+dotnet-fetch *ARGS:
+    & "{{dotnet_fetch_script}}" {{ARGS}}
+
+# Compile the C# assembly (the editor's Build button does the same). Guarded by dotnet-check.
+build: dotnet-check
     dotnet build -nologo
 
 # Rebuild .godot/ -- needed after a checkout the editor hasn't opened yet, or after godot-fetch
