@@ -70,6 +70,8 @@ Design docs, one per system, live under `docs/` (`netcode.md`, `simulation.md`, 
   regardless of the machine's user-level NuGet config.
 - Local multiplayer testing is multi-process: `just demo [N]` (windowed) and `just demo-test [N]`
   (headless, exit code). Both accept `-AutoPlay`. See `docs/session.md`.
+- `just --list` shows only the **comment line directly above a recipe**. Keep that line a one-line summary;
+  put longer notes above it, separated by a blank line, or they show up truncated in the listing.
 
 ## Layout
 
