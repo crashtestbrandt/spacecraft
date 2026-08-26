@@ -11,6 +11,8 @@ set shell := ["powershell.exe", "-NoProfile", "-Command"]
 # resolved binary path.
 godot := justfile_directory() / "tools" / "godot-run.ps1"
 godot_fetch_script := justfile_directory() / "tools" / "godot-fetch.ps1"
+demo_script := justfile_directory() / "tools" / "demo.ps1"
+demo_test_script := justfile_directory() / "tools" / "demo-test.ps1"
 
 default:
     @just --list
@@ -28,7 +30,23 @@ editor:
 run:
     & "{{godot}}" --path .
 
+# Compile the C# assembly with the .NET SDK on PATH (the editor's Build button does the same).
+build:
+    dotnet build -nologo
+
 # Rebuild .godot/ -- needed after a checkout the editor hasn't opened yet, or after godot-fetch
 # installs a different editor build.
 reimport:
     & "{{godot}}" --headless --path . --import
+
+# Local multiplayer demo: one host window + (N-1) guest windows on 127.0.0.1:7777. Click Ready in
+# each. `just demo 4` for four players; `just demo 2 -AutoPlay` readies every instance and scripts a
+# full-army charge so the match plays itself. See docs/session.md.
+demo N="2" *ARGS:
+    & "{{demo_script}}" -Players {{N}} {{ARGS}}
+
+# Headless self-test over the real ENet loopback: N processes host/join, auto-ready, verify their
+# armies on the verified timeline and exit 0. Nonzero exit if any peer fails. `just demo-test 4`,
+# add -AutoPlay to also run the scripted engagement.
+demo-test N="2" *ARGS:
+    & "{{demo_test_script}}" -Players {{N}} {{ARGS}}
