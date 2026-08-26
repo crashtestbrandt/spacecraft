@@ -1,0 +1,10 @@
+{
+  "_comment": "The pinned Godot 4.7 .NET (mono) editor and export templates. `just godot-fetch` verifies every downloaded byte against this before installing it. Digests are copied from the godotengine/godot-builds release's own SHA512-SUMS.txt asset, not recomputed locally.",
+  "repo": "godotengine/godot-builds",
+  "tag": "4.7-stable",
+  "assets": {
+    "Godot_v4.7-stable_mono_win64.zip": "61b38d57e71ad03b43b71e47434f0ec141fd87e04a6021b50af31a03c28536d9c6bedbc7ec5ac14b6b4c73b44b3794093697d1e87dac9d87367ad258a56be932",
+    "Godot_v4.7-stable_mono_win32.zip": "61157a242f9bdc36aecf642903e4acec034f2e8ee7cc80efa9772d3bcddb25b55bd1fdf68ed2a3fa02d9237f447860532b753f257ac1e2584fe88161f516c997",
+    "Godot_v4.7-stable_mono_export_templates.tpz": "637fb6f53f64557ac03aff8f635871c495b7530e86a3b961aa2d0d91c995c6b24f466c2b7399562625474ef6eba44c90c3de45db9b5d09a1b3c645711136b613"
+  }
+}

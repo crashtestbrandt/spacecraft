@@ -1,0 +1,19 @@
+; Engine configuration file.
+; It's best edited using the editor UI and not directly,
+; since the parameters that go here are not all obvious.
+;
+; Format:
+;   [section] ; section goes to [section] group in config file
+;   param=value ; assign values to parameters
+
+config_version=5
+
+[application]
+
+config/name="Spacecraft"
+run/main_scene="res://scenes/main.tscn"
+config/features=PackedStringArray("4.7", "C#", "Forward Plus")
+
+[dotnet]
+
+project/assembly_name="Spacecraft"

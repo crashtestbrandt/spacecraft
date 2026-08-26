@@ -1,0 +1,22 @@
+# Godot 4.x cache
+.godot/
+
+# .NET / Mono build artifacts
+.mono/
+bin/
+obj/
+*.csproj.user
+mono_crash.*.json
+
+# The pinned Godot 4.7 .NET editor `just godot-fetch` installs (see godot.lock). Never committed --
+# tools/godot-fetch.ps1 reinstalls it from the lock on a fresh clone, or point $env:GODOT_BIN at an
+# existing install to skip the fetch entirely. See README.md.
+.godot-editor/
+
+# Export output
+build/
+
+# OS cruft
+Thumbs.db
+Desktop.ini
+.DS_Store
