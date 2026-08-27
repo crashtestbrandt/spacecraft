@@ -1,6 +1,6 @@
 # Spacecraft
 
-A 2D top-down, 16-bit style RTS with Galaga-style spacecraft. Godot 4.7 .NET (C#), Windows-only for now.
+A 2D top-down, 16-bit style RTS demo with Galaga-style spacecraft. Godot 4.7 .NET (C#), Windows-only for now.
 Multiplayer is 2–4 player P2P lockstep on [Klotho](https://github.com/xpTURN/Klotho) over ENet.
 
 ![Two-player match at tick 149: fighters engaging at the center, flagships still en route](docs/images/demo-2p.png)
